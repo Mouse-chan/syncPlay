@@ -1,9 +1,5 @@
 import customtkinter as ctk
 
-
-# Предполагается, что логика мессенджера уже написана и находится в модуле messenger_logic
-# from messenger_logic import send_message, receive_messages
-
 class MessengerApp(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -17,7 +13,6 @@ class MessengerApp(ctk.CTk):
         self.create_widgets()
 
     def create_widgets(self):
-        # Область отображения сообщений (можно использовать CTkTextbox)
         self.text_display = ctk.CTkTextbox(self, state="disabled")
         self.text_display.pack(fill="both", expand=True, padx=10, pady=(10, 5))
 
@@ -45,6 +40,7 @@ class MessengerApp(ctk.CTk):
             self.entry_input.delete(0, "end")
             # 3. Здесь должна быть твоя логика отправки сообщения в сеть
             # send_message(message)
+            return message
 
     def add_message_to_display(self, message):
         """Добавляет сообщение в текстовую область."""

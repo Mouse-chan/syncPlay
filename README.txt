@@ -5,6 +5,7 @@
 pip install aiohttp
 pip install aioconsole
 pip install rich
+pip install customtkinter
 
 # Если видео не включается, возможно программа не видит твой плеер.
 # Добавь путь к VLC в системные пути:

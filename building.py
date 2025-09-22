@@ -58,9 +58,8 @@ class MessengerApp(ctk.CTk):
         if message:
             msg_with_time = '[' + str(time.strftime("%H:%M:%S")) + ']  ' + message
             # self.add_message_to_display(msg_with_time)
-            self.entry_input.delete(0, "end")
             self.send_message(msg_with_time)
-            #self.send_message(msg_with_time)
+            self.entry_input.delete(0, "end")
             return msg_with_time
         return None
 
@@ -82,15 +81,11 @@ class MessengerApp(ctk.CTk):
 
     def check_for_new_messages(self):
         """Проверяет наличие новых сообщений."""
-        #print("🔄 Проверяю новые сообщения...")
         response = requests.get(f"{SERVER_URL}/receive", timeout=5)
-        # print(f"✅ Получен ответ. Статус: {response.status_code}")
         data = response.json()
 
         if data['msg'] != self.MESSAGES and data['msg']:
             new_mess = a_origin_els(data['msg'], self.MESSAGES)
-            """for ms in new_mess:
-                print(f"📨: {ms}\n")"""
             self.MESSAGES = data['msg']
             return new_mess
         return None
@@ -118,7 +113,6 @@ class MessengerApp(ctk.CTk):
 
     def start_message_checker(self):
         """Запускает проверку сообщений в основном потоке GUI."""
-        # Запускаем первую проверку через 1 секунду
         self.after(2000, self.update_messages)
 
     def start_message_checker_thread(self):
@@ -133,7 +127,7 @@ class MessengerApp(ctk.CTk):
                             self.after(0, self.add_message_to_display, f"Система: {ms}")
                 except Exception as e:
                     print(f"Ошибка в потоке проверки: {e}")
-                time.sleep(1)  # Проверка каждые 2 секунды
+                time.sleep(1.5)  # Проверка каждые 2 секунды
 
         thread = threading.Thread(target=message_checker_loop, daemon=True)
         thread.start()
@@ -143,66 +137,10 @@ class MessengerApp(ctk.CTk):
         self.is_running = False
         self.destroy()
 
-"""def send_message(message):
-    try:
-        print(f"🔄 Пытаюсь отправить: '{message}'")
-        response = requests.post(f"{SERVER_URL}/send",
-                                 json={'msg': message},
-                                 timeout=5)
-        print(f"✅ Отправлено! Статус: {response.status_code}")
-        return True
-    except requests.exceptions.Timeout:
-        print("❌ Таймаут при отправке")
-    except requests.exceptions.ConnectionError:
-        print("❌ Ошибка соединения при отправке")
-    except Exception as e:
-        print(f"❌ Ошибка отправки: {e}")
-    return False"""
-
-
-"""def test_connection():
-    Тест соединения с сервером
-    try:
-        print("🧪 Тестирую соединение с сервером...")
-        response = requests.get(f"{SERVER_URL}/receive", timeout=10)
-        print(f"✅ Сервер отвечает! Статус: {response.status_code}")
-        print(f"📋 Ответ сервера: {response.text}")
-        return True
-    except Exception as e:
-        print(f"❌ Не могу подключиться к серверу: {e}")
-        print("Проверьте:")
-        print("1. Правильный ли URL?")
-        print("2. Активен ли веб-сайт на PythonAnywhere?")
-        print("3. Есть ли интернет соединение?")
-        return False"""
 
 def main():
-    """# Запуск теста соединения
-    if not test_connection():
-        print("Прерываю работу...")
-        exit()
-
-    print("\n💬 Чат запущен! Вводите сообщения:")"""
-
     app = MessengerApp()
     app.mainloop()
-
-    """while True:
-        message = input("Ваше сообщение (или 'exit' для выхода): ")
-        if message == 'exit':
-            break
-
-        if send_message(message):
-            print("✓ Сообщение отправлено на сервер")
-
-        # Даем время серверу обработать
-        time.sleep(1)
-
-        received = receive_message()
-        if received:
-            print(f"👤 Получено: {received}")
-
-        time.sleep(1)"""
 
 if __name__ == '__main__':
     main()

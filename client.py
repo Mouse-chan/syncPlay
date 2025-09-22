@@ -6,11 +6,11 @@ import json
 SERVER_URL = "https://nezumi403.pythonanywhere.com"
 
 
-def send_message(msg):
+def send_message(message):
     try:
-        print(f"🔄 Пытаюсь отправить: '{msg}'")
+        print(f"🔄 Пытаюсь отправить: '{message}'")
         response = requests.post(f"{SERVER_URL}/send",
-                                 json={'msg': msg},
+                                 json={'msg': message},
                                  timeout=5)
         print(f"✅ Отправлено! Статус: {response.status_code}")
         return True
@@ -59,26 +59,29 @@ def test_connection():
         print("3. Есть ли интернет соединение?")
         return False
 
+def main():
+    # Запуск теста соединения
+    if not test_connection():
+        print("Прерываю работу...")
+        exit()
 
-# Запуск теста соединения
-if not test_connection():
-    print("Прерываю работу...")
-    exit()
+    print("\n💬 Чат запущен! Вводите сообщения:")
+    while True:
+        message = input("Ваше сообщение (или 'exit' для выхода): ")
+        if message == 'exit':
+            break
 
-print("\n💬 Чат запущен! Вводите сообщения:")
-while True:
-    msg = input("Ваше сообщение (или 'exit' для выхода): ")
-    if msg == 'exit':
-        break
+        if send_message(message):
+            print("✓ Сообщение отправлено на сервер")
 
-    if send_message(msg):
-        print("✓ Сообщение отправлено на сервер")
+        # Даем время серверу обработать
+        time.sleep(1)
 
-    # Даем время серверу обработать
-    time.sleep(1)
+        received = receive_message()
+        if received:
+            print(f"👤 Получено: {received}")
 
-    received = receive_message()
-    if received:
-        print(f"👤 Получено: {received}")
+        time.sleep(1)
 
-    time.sleep(1)
+if __name__ == '__main__':
+    main()

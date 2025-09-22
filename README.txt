@@ -1,7 +1,9 @@
 Если ты читаешь этот текст, то ты скачал лучшую программку в мире :3
 
 # Чтобы ее запустить тебе нужно установить зависимости:
-```pip install requests flask python-vlc```
+```pip install requests flask python-vlc keyboard```
+pip install pynput
+pip install pywin32
 
 # Если видео не включается, возможно программа не видит твой плеер.
 # Добавь путь к VLC в системные пути:

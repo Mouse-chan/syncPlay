@@ -1,8 +1,9 @@
 # messages_controller.py
-import os
 
+import os
 import requests
 import time
+
 
 def a_origin_els(a, b):
     """Функция поиска новых элементов"""

@@ -5,7 +5,10 @@ from messages_controller import MessagesCtrl
 
 def main():
     msg_ctrl = MessagesCtrl()
+    test_message(msg_ctrl)
 
+
+def test_message(msg_ctrl):
     if not msg_ctrl.check_connection():
         exit()
 

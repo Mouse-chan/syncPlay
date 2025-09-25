@@ -8,7 +8,7 @@ from player_controller import PlayerCtrl
 
 def main():
     msg_ctrl = MessagesCtrl()
-    # test_message(msg_ctrl)
+    test_message(msg_ctrl)
 
     play_ctrl = PlayerCtrl()
     player_test(play_ctrl)

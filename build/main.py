@@ -8,7 +8,7 @@ from player_controller import PlayerCtrl
 
 def main():
     msg_ctrl = MessagesCtrl()
-    #test_message(msg_ctrl)
+    # test_message(msg_ctrl)
 
     play_ctrl = PlayerCtrl()
     player_test(play_ctrl)
@@ -19,17 +19,20 @@ def test_message(msg_ctrl):
         exit()
 
     while True:
-        time.sleep(0.1)
+        try:
+            time.sleep(0.1)
 
-        m = input(": ")
-        msg_ctrl.send_message(m)
+            m = input(": ")
+            msg_ctrl.send_message(m)
 
-        time.sleep(0.1)
+            time.sleep(0.1)
 
-        msgs = msg_ctrl.receive_message()
+            msgs = msg_ctrl.receive_message()
 
-        for i in range(len(msgs)):
-            print(f'[{msgs[i]['time']}] {msgs[i]['nickname']}: {msgs[i]['text']}\n')
+            for i in range(len(msgs)):
+                print(f'[{msgs[i]['time']}] {msgs[i]['nickname']}: {msgs[i]['text']}\n')
+        except Exception as e:
+            print(f"❌ Ошибка в тесте сообщений: {e}")
 
 def player_test(play_ctrl):
     play_ctrl.set_new_video("C:\\Users\\belak\\Videos\\Мои видео\\Аниме\\Агент времени\\Link Click 1\\02.mkv")

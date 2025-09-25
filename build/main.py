@@ -1,11 +1,17 @@
+# main.py
+
 import time
 
 from messages_controller import MessagesCtrl
+from player_controller import PlayerCtrl
 
 
 def main():
     msg_ctrl = MessagesCtrl()
-    test_message(msg_ctrl)
+    #test_message(msg_ctrl)
+
+    play_ctrl = PlayerCtrl()
+    player_test(play_ctrl)
 
 
 def test_message(msg_ctrl):
@@ -25,6 +31,10 @@ def test_message(msg_ctrl):
         for i in range(len(msgs)):
             print(f'[{msgs[i]['time']}] {msgs[i]['nickname']}: {msgs[i]['text']}\n')
 
+def player_test(play_ctrl):
+    play_ctrl.set_new_video("C:\\Users\\belak\\Videos\\Мои видео\\Аниме\\Агент времени\\Link Click 1\\02.mkv")
+    while True:
+        play_ctrl.update()
 
 if __name__ == '__main__':
     main()

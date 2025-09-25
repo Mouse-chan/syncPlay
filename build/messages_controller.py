@@ -55,8 +55,6 @@ class MessagesCtrl:
 
             if data['msg'] != self.MESSAGES and data['msg']:
                 new_mess = a_origin_els(data['msg'], self.MESSAGES)
-                """for ms in new_mess:
-                    print(f"📨: {ms}\n")"""
                 self.MESSAGES = data['msg']
                 return new_mess
             return None

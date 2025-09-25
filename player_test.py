@@ -11,10 +11,8 @@ import os
 
 def is_window_active():
     try:
-        # Получаем ID процесса активного окна
         window = win32gui.GetForegroundWindow()
         _, active_pid = win32process.GetWindowThreadProcessId(window)
-        # Получаем ID текущего процесса
         current_pid = os.getpid()
         return active_pid == current_pid
     except:

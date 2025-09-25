@@ -1,7 +1,7 @@
 Если ты читаешь этот текст, то ты скачал лучшую программку в мире :3
 
 # Чтобы ее запустить тебе нужно установить зависимости:
-```pip install requests flask python-vlc keyboard```
+pip install requests flask python-vlc keyboard
 pip install aiohttp
 pip install aioconsole
 pip install rich

@@ -41,7 +41,7 @@ class MessagesCtrl:
             response = requests.post(f"{self.SERVER_URL}/send",
                                      json={'msg': new_msg},
                                      timeout=5)
-            print(f"✅ Cообщение отправлено! Статус: {response.status_code}")
+            # print(f"✅ Cообщение отправлено! Статус: {response.status_code}")
             return response.status_code
         except Exception as e:
             print(f"❌ Ошибка отправки: {e}")

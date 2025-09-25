@@ -1,17 +1,24 @@
 # main.py
 
 import time
+import tkinter as tk
 
 from messages_controller import MessagesCtrl
 from player_controller import PlayerCtrl
+from chat_app import ChatApp
 
 
 def main():
-    msg_ctrl = MessagesCtrl()
+    """msg_ctrl = MessagesCtrl()
     test_message(msg_ctrl)
 
     play_ctrl = PlayerCtrl()
-    player_test(play_ctrl)
+    player_test(play_ctrl)"""
+
+    root = tk.Tk()
+    app = ChatApp(root)
+    root.protocol("WM_DELETE_WINDOW", app.on_closing)
+    root.mainloop()
 
 
 def test_message(msg_ctrl):

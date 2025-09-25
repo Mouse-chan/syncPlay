@@ -2,12 +2,7 @@
 
 # Чтобы ее запустить тебе нужно установить зависимости:
 pip install requests flask python-vlc keyboard
-pip install aiohttp
-pip install aioconsole
-pip install rich
-pip install customtkinter
 pip install pywin32
-pip install windows-curses
 
 # Если видео не включается, возможно программа не видит твой плеер.
 # Добавь путь к VLC в системные пути:

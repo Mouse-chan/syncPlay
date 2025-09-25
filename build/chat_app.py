@@ -89,6 +89,7 @@ class ChatApp:
             while True:
                 messages = self.message_queue.get_nowait()
                 self.update_chat_display(messages)
+                self.check_chat_commands(messages)
         except queue.Empty:
             pass
 
@@ -110,6 +111,25 @@ class ChatApp:
         self.chat_history.configure(autoseparators=True)
         self.chat_history.see(tk.END)
         self.chat_history.config(state='disabled')
+
+    def check_chat_commands(self, messages):
+        # TODO: обработчик команд, с учётом задержки
+
+        for msg in messages:
+            msg_text: str = msg.get('text', '')
+            if len(msg_text) > 0:
+                if msg_text[0] == "-":
+                    if msg_text == '-play' or msg_text == '-p':
+                        print('play')
+                    elif msg_text == '-stop' or msg_text == '-s':
+                        print('stop')
+                    elif msg_text[:4] == '-time' or msg_text[:2] == '-t':
+                        cmd_time = msg_text.split(' ')[1]
+                        print('time ' + cmd_time)
+
+
+
+
 
     def on_closing(self):
         """Вызывается при закрытии приложения"""

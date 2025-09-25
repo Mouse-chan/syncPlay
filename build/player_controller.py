@@ -21,6 +21,7 @@ def is_window_active_cached():
 
 class PlayerCtrl:
     def __init__(self, video_path=None):
+        # TODO: выбор файла видео, добавление файла сабов, изменение громкости
         self.video_path = video_path
         self._instance: vlc.Instance = vlc.Instance('--no-xlib --quiet --sub-source=marq')
         self._player: vlc.MediaPlayer = self._instance.media_player_new()

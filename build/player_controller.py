@@ -53,10 +53,12 @@ class PlayerCtrl:
         self._player.audio_set_mute(False)
 
     def play(self):
-        self._player.play()
+        if not self._player.is_playing():
+            self._player.play()
 
     def pause(self):
-        self._player.pause()
+        if self._player.is_playing():
+            self._player.pause()
 
     def set_time(self, time_str):
         """Set player time from hh:mm:ss format"""

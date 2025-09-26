@@ -154,7 +154,7 @@ class ChatApp:
                     self.player_ctrl = PlayerCtrl()
                     self.player_ctrl.set_new_video(new_video_path)
                     print('load ' + new_video_path)
-            else:
+            elif True:
                 if msg_text[:5] == '-play' or msg_text[:2] == '-p':
                     cmd_time = msg_text.split(' ')[1]
                     self.player_ctrl.set_time(cmd_time)

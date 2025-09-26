@@ -1,5 +1,5 @@
 # messages_controller.py
-
+import hashlib
 import os
 import requests
 import time
@@ -14,8 +14,8 @@ class MessagesCtrl:
     MESSAGES = []
 
     def __init__(self):  # TODO: delite if not use
-        self.user = 'user' + str(os.getpid())
-        self.nickname = self.user
+        self.user_id = str(int(hashlib.sha256(os.getlogin().encode()).hexdigest(), 16))[:5]
+        self.nickname = 'user' + self.user_id
 
     def check_connection(self):
         try:
@@ -33,7 +33,7 @@ class MessagesCtrl:
                 return False  # TODO: funcs in chat
 
             new_msg = {
-                'user': self.user,
+                'user': self.user_id,
                 'nickname': self.nickname,
                 'time': str(time.strftime("%H:%M:%S")),
                 'text': message

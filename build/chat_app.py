@@ -24,7 +24,7 @@ class ChatApp:
             print("Внимание: проблемы с соединением")
 
         # Создаем виджет для отображения истории сообщений
-        self.chat_history = scrolledtext.ScrolledText(master, state='disabled', wrap=tk.WORD)
+        self.chat_history: scrolledtext.ScrolledText = scrolledtext.ScrolledText(master, state='disabled', wrap=tk.WORD)
         self.chat_history.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
         # Создаем фрейм для размещения поля ввода и кнопки отправки
@@ -116,16 +116,24 @@ class ChatApp:
         # TODO: обработчик команд, с учётом задержки
 
         for msg in messages:
-            msg_text: str = msg.get('text', '')
-            if len(msg_text) > 0:
-                if msg_text[0] == "-":
-                    if msg_text == '-play' or msg_text == '-p':
-                        print('play')
-                    elif msg_text == '-stop' or msg_text == '-s':
-                        print('stop')
-                    elif msg_text[:4] == '-time' or msg_text[:2] == '-t':
-                        cmd_time = msg_text.split(' ')[1]
-                        print('time ' + cmd_time)
+            msg_text: str = msg.get('text', None)
+            msg_user = msg.get('user')
+            if not msg_text or msg_text[0] != "-":
+                continue
+
+            if msg_user == self.msg_ctrl.user_id:
+                if msg_text[:4] == '-nick' or msg_text[:2] == '-n':
+                    new_nick = msg_text.split(' ')[1]
+                    self.msg_ctrl.nickname = new_nick
+                    print('nick ' + new_nick)
+            else:
+                if msg_text == '-play' or msg_text == '-p':
+                    print('play')
+                elif msg_text == '-stop' or msg_text == '-s':
+                    print('stop')
+                elif msg_text[:4] == '-time' or msg_text[:2] == '-t':
+                    cmd_time = msg_text.split(' ')[1]
+                    print('time ' + cmd_time)
 
 
 

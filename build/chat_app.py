@@ -156,14 +156,14 @@ class ChatApp:
                     print('load ' + new_video_path)
             else:
                 if msg_text[:5] == '-play' or msg_text[:2] == '-p':
-                    self.player_ctrl.play()
                     cmd_time = msg_text.split(' ')[1]
                     self.player_ctrl.set_time(cmd_time)
+                    self.player_ctrl.play()
                     print('play')
                 elif msg_text[:5] == '-stop' or msg_text[:2] == '-s':
-                    self.player_ctrl.pause()
                     cmd_time = msg_text.split(' ')[1]
                     self.player_ctrl.set_time(cmd_time)
+                    self.player_ctrl.pause()
                     print('stop')
                 elif msg_text[:5] == '-time' or msg_text[:2] == '-t':
                     cmd_time = msg_text.split(' ')[1]

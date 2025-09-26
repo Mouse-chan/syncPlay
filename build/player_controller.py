@@ -131,12 +131,12 @@ class PlayerCtrl:
 
             elif keyboard.is_pressed('space'):
                 if str(self._player.get_state()) == 'State.Playing':
-                    #self._player.pause()
+                    self._player.pause()
                     self._last_key_time = current_time
                     self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                     return '-stop ' + self.current_time_str
                 else:
-                    #self._player.play()
+                    self._player.play()
                     self._last_key_time = current_time
                     self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                     return '-play ' + self.current_time_str

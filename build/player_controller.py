@@ -103,33 +103,33 @@ class PlayerCtrl:
 
             elif keyboard.is_pressed('shift+left'):
                 self._player.set_time(max(0, self._player.get_time() - 500))
-                return '-t ' + self.current_time_str
+                return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('shift+right'):
                 self._player.set_time(min(self._player.get_length() - 1,
                                           self._player.get_time() + 500))
-                return '-t ' + self.current_time_str
+                return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('left'):
                 self._player.set_time(max(0, self._player.get_time() - 10000))
                 self._last_key_time = current_time
-                return '-t ' + self.current_time_str
+                return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('right'):
                 self._player.set_time(min(self._player.get_length() - 1,
                                           self._player.get_time() + 10000))
                 self._last_key_time = current_time
-                return '-t ' + self.current_time_str
+                return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('space'):
                 if str(self._player.get_state()) == 'State.Playing':
                     self._player.pause()
                     self._last_key_time = current_time
-                    return '-s'
+                    return '-stop'
                 else:
                     self._player.play()
                     self._last_key_time = current_time
-                    return '-p'
+                    return '-play'
 
             elif keyboard.is_pressed('='):
                 self._switch_audio_track()

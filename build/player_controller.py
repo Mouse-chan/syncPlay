@@ -51,6 +51,7 @@ class PlayerCtrl:
 
         self._player.play()
         self._player.audio_set_mute(False)
+        time.sleep(0.5)
         self._player.pause()
 
     def play(self):
@@ -132,11 +133,13 @@ class PlayerCtrl:
                 if str(self._player.get_state()) == 'State.Playing':
                     self._player.pause()
                     self._last_key_time = current_time
-                    return '-stop'
+                    self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
+                    return '-stop ' + self.current_time_str
                 else:
                     self._player.play()
                     self._last_key_time = current_time
-                    return '-play'
+                    self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
+                    return '-play ' + self.current_time_str
 
             elif keyboard.is_pressed('='):
                 self._switch_audio_track()

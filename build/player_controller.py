@@ -106,37 +106,37 @@ class PlayerCtrl:
 
 
             elif keyboard.is_pressed('shift+left'):
-                self._player.set_time(max(0, self._player.get_time() - 500))
+                #self._player.set_time(max(0, self._player.get_time() - 500))
                 self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                 return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('shift+right'):
-                self._player.set_time(min(self._player.get_length() - 1,
-                                          self._player.get_time() + 500))
+                #self._player.set_time(min(self._player.get_length() - 1,
+                #                          self._player.get_time() + 500))
                 self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                 return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('left'):
-                self._player.set_time(max(0, self._player.get_time() - 10000))
+                #self._player.set_time(max(0, self._player.get_time() - 10000))
                 self._last_key_time = current_time
                 self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                 return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('right'):
-                self._player.set_time(min(self._player.get_length() - 1,
-                                          self._player.get_time() + 10000))
+                #self._player.set_time(min(self._player.get_length() - 1,
+                #                          self._player.get_time() + 10000))
                 self._last_key_time = current_time
                 self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                 return '-time ' + self.current_time_str
 
             elif keyboard.is_pressed('space'):
                 if str(self._player.get_state()) == 'State.Playing':
-                    self._player.pause()
+                    #self._player.pause()
                     self._last_key_time = current_time
                     self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                     return '-stop ' + self.current_time_str
                 else:
-                    self._player.play()
+                    #self._player.play()
                     self._last_key_time = current_time
                     self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                     return '-play ' + self.current_time_str

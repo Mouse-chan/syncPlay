@@ -51,6 +51,7 @@ class PlayerCtrl:
 
         self._player.play()
         self._player.audio_set_mute(False)
+        self._player.pause()
 
     def play(self):
         if not self._player.is_playing():

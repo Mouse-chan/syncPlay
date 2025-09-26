@@ -4,7 +4,10 @@ import threading
 import queue
 import time
 
+from build.player_controller import PlayerCtrl
 from messages_controller import MessagesCtrl
+from static import str_time_to_ms
+from static import ms_to_str_time
 
 
 class ChatApp:
@@ -15,6 +18,8 @@ class ChatApp:
 
         self.msg_ctrl = MessagesCtrl()
         self.message_queue = queue.Queue()  # Очередь для новых сообщений
+
+        self.player_ctrl = PlayerCtrl()
 
         # Флаг для управления потоком опроса
         self.polling_active = True
@@ -50,9 +55,10 @@ class ChatApp:
         # Запускаем периодическую проверку очереди сообщений
         self.process_message_queue()
 
-    def send_message_handler(self, event=None):
+    def send_message_handler(self, event=None, message=None):
         """Обрабатывает отправку сообщения в отдельном потоке"""
-        message = self.entry.get().strip()
+        if not message:
+            message = self.entry.get().strip()
         if message:
             # Очищаем поле ввода сразу (не дожидаясь отправки)
             self.entry.delete(0, tk.END)
@@ -87,6 +93,9 @@ class ChatApp:
         try:
             # Обрабатываем все сообщения в очереди
             while True:
+                event = self.update_player()
+                self.event_manage(event)
+
                 messages = self.message_queue.get_nowait()
                 self.update_chat_display(messages)
                 self.check_chat_commands(messages)
@@ -95,6 +104,12 @@ class ChatApp:
 
         # Планируем следующую проверку через 100 мс
         self.master.after(100, self.process_message_queue)
+
+    def event_manage(self, event):
+        if not event:
+            return
+        self.send_message_handler(message=event)
+
 
     def update_chat_display(self, messages):
         """Обновляет окно чата новыми сообщениями"""
@@ -112,27 +127,44 @@ class ChatApp:
         self.chat_history.see(tk.END)
         self.chat_history.config(state='disabled')
 
+    def update_player(self):
+        return self.player_ctrl.update()
+
     def check_chat_commands(self, messages):
         # TODO: обработчик команд, с учётом задержки
 
         for msg in messages:
             msg_text: str = msg.get('text', None)
             msg_user = msg.get('user')
-            if not msg_text or msg_text[0] != "-":
+            msg_time = msg.get('time')
+            msg_time_ms = str_time_to_ms(msg_time)
+            cur_time_ms = str_time_to_ms(time.strftime("%H:%M:%S"))
+            if not msg_text or msg_text[0] != "-" or cur_time_ms-msg_time_ms > 60000:
                 continue
 
+
+            if msg_text[:5] == '-load' or msg_text[:2] == '-l':
+                new_video_path = msg_text.replace(' ', '*', 1).split('*')[1]
+                self.player_ctrl.close_player()
+                self.player_ctrl = PlayerCtrl()
+                self.player_ctrl.set_new_video(new_video_path)
+                print('load ' + new_video_path)
+
             if msg_user == self.msg_ctrl.user_id:
-                if msg_text[:4] == '-nick' or msg_text[:2] == '-n':
+                if msg_text[:5] == '-nick' or msg_text[:2] == '-n':
                     new_nick = msg_text.split(' ')[1]
                     self.msg_ctrl.nickname = new_nick
                     print('nick ' + new_nick)
             else:
                 if msg_text == '-play' or msg_text == '-p':
+                    self.player_ctrl.play()
                     print('play')
                 elif msg_text == '-stop' or msg_text == '-s':
+                    self.player_ctrl.pause()
                     print('stop')
-                elif msg_text[:4] == '-time' or msg_text[:2] == '-t':
+                elif msg_text[:5] == '-time' or msg_text[:2] == '-t':
                     cmd_time = msg_text.split(' ')[1]
+                    self.player_ctrl.set_time(cmd_time)
                     print('time ' + cmd_time)
 
 

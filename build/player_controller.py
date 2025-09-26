@@ -5,16 +5,15 @@ import win32gui
 import win32process
 import os
 import sys
-from typing import Optional
 
 
 def is_window_active_cached():
-    """Кешированная проверка активного окна"""
+    """Проверяет, активно ли окно VLC плеера"""
     try:
         window = win32gui.GetForegroundWindow()
-        _, active_pid = win32process.GetWindowThreadProcessId(window)
-        current_pid = os.getpid()
-        return active_pid == current_pid
+        window_title = win32gui.GetWindowText(window)
+        # Проверяем, что активное окно - это окно VLC (обычно содержит 'VLC' в заголовке)
+        return 'VLC' in window_title
     except:
         return False
 
@@ -34,6 +33,7 @@ class PlayerCtrl:
         self._cached_window_active = False
         self._last_update_time = 0
         self._update_interval = 0.033  # ~30 FPS
+        self.current_time_str = '00:00:00'
 
         if self.video_path:
             self.set_new_video(self.video_path)
@@ -57,6 +57,17 @@ class PlayerCtrl:
 
     def pause(self):
         self._player.pause()
+
+    def set_time(self, time_str):
+        """Set player time from hh:mm:ss format"""
+        try:
+            # Split the time string into hours, minutes, and seconds
+            h, m, s = map(float, time_str.split(':'))
+            # Convert to milliseconds (1h = 3600000ms, 1m = 60000ms, 1s = 1000ms)
+            time_ms = int((h * 3600 + m * 60 + s) * 1000)
+            self._player.set_time(time_ms)
+        except (ValueError, AttributeError) as e:
+            print(f"Invalid time format. Please use hh:mm:ss format. Error: {e}")
 
     def _should_handle_input(self) -> bool:
         """Проверяет, можно ли обрабатывать ввод"""
@@ -92,27 +103,33 @@ class PlayerCtrl:
 
             elif keyboard.is_pressed('shift+left'):
                 self._player.set_time(max(0, self._player.get_time() - 500))
+                return '-t ' + self.current_time_str
 
             elif keyboard.is_pressed('shift+right'):
                 self._player.set_time(min(self._player.get_length() - 1,
                                           self._player.get_time() + 500))
+                return '-t ' + self.current_time_str
 
             elif keyboard.is_pressed('left'):
                 self._player.set_time(max(0, self._player.get_time() - 10000))
                 self._last_key_time = current_time
+                return '-t ' + self.current_time_str
 
             elif keyboard.is_pressed('right'):
                 self._player.set_time(min(self._player.get_length() - 1,
                                           self._player.get_time() + 10000))
                 self._last_key_time = current_time
+                return '-t ' + self.current_time_str
 
             elif keyboard.is_pressed('space'):
                 if str(self._player.get_state()) == 'State.Playing':
                     self._player.pause()
                     self._last_key_time = current_time
+                    return '-s'
                 else:
                     self._player.play()
                     self._last_key_time = current_time
+                    return '-p'
 
             elif keyboard.is_pressed('='):
                 self._switch_audio_track()
@@ -120,10 +137,6 @@ class PlayerCtrl:
 
             elif keyboard.is_pressed('-'):
                 self._switch_subtitle_track()
-                self._last_key_time = current_time
-
-            elif keyboard.is_pressed('t'):
-                self._player.video_set_marquee_string(1, "Test")
                 self._last_key_time = current_time
 
 
@@ -156,13 +169,27 @@ class PlayerCtrl:
 
         # Ограничение FPS
         if current_time - self._last_update_time < self._update_interval:
-            return
+            return None
 
         self._last_update_time = current_time
 
-        # Обработка ввода
-        self._handle_keyboard_input()
+        self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
+        self._player.video_set_marquee_string(1, self.current_time_str)
 
-        # Обновление времени на экране (не чаще чем FPS)
-        current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
-        self._player.video_set_marquee_string(1, current_time_str)
+        # Обработка ввода
+        event = self._handle_keyboard_input()
+
+        return event
+
+    def close_player(self):
+        """Закрывает плеер и освобождает ресурсы"""
+        try:
+            if self._player:
+                self._player.stop()
+                self._player.release()
+            if self._instance:
+                self._instance.release()
+            return True
+        except Exception as e:
+            print(f"Ошибка при закрытии плеера: {e}")
+            return False

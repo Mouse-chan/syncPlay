@@ -142,7 +142,7 @@ class ChatApp:
             if not msg_text or msg_text[0] != "-" or cur_time_ms-msg_time_ms > 60000:
                 continue
 
-
+            #if True:
             if msg_user == self.msg_ctrl.user_id:
                 if msg_text[:5] == '-nick' or msg_text[:2] == '-n':
                     new_nick = msg_text.split(' ')[1]
@@ -155,20 +155,20 @@ class ChatApp:
                     self.player_ctrl.set_new_video(new_video_path)
                     print('load ' + new_video_path)
             #else:
-                if msg_text[:5] == '-play' or msg_text[:2] == '-p':
-                    cmd_time = msg_text.split(' ')[1]
-                    self.player_ctrl.set_time(cmd_time)
-                    self.player_ctrl.play()
-                    print('play')
-                elif msg_text[:5] == '-stop' or msg_text[:2] == '-s':
-                    cmd_time = msg_text.split(' ')[1]
-                    self.player_ctrl.set_time(cmd_time)
-                    self.player_ctrl.pause()
-                    print('stop')
-                elif msg_text[:5] == '-time' or msg_text[:2] == '-t':
-                    cmd_time = msg_text.split(' ')[1]
-                    self.player_ctrl.set_time(cmd_time)
-                    print('time ' + cmd_time)
+            if msg_text[:5] == '-play' or msg_text[:2] == '-p':
+                cmd_time = msg_text.split(' ')[1]
+                self.player_ctrl.set_time(cmd_time)
+                self.player_ctrl.play()
+                print('play')
+            elif msg_text[:5] == '-stop' or msg_text[:2] == '-s':
+                cmd_time = msg_text.split(' ')[1]
+                self.player_ctrl.set_time(cmd_time)
+                self.player_ctrl.pause()
+                print('stop')
+            elif msg_text[:5] == '-time' or msg_text[:2] == '-t':
+                cmd_time = msg_text.split(' ')[1]
+                self.player_ctrl.set_time(cmd_time)
+                print('time ' + cmd_time)
 
 
 

@@ -147,28 +147,28 @@ class ChatApp:
                 if msg_text[:5] == '-nick' or msg_text[:2] == '-n':
                     new_nick = msg_text.split(' ')[1]
                     self.msg_ctrl.nickname = new_nick
-                    print('nick ' + new_nick)
+                    # print('nick ' + new_nick)
                 if msg_text[:5] == '-load' or msg_text[:2] == '-l':
                     new_video_path = msg_text.replace(' ', '*', 1).split('*')[1]
                     self.player_ctrl.close_player()
                     self.player_ctrl = PlayerCtrl()
                     self.player_ctrl.set_new_video(new_video_path)
-                    print('load ' + new_video_path)
+                    # print('load ' + new_video_path)
             #else:
             if msg_text[:5] == '-play' or msg_text[:2] == '-p':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
                 self.player_ctrl.play()
-                print('play')
+                # print('play')
             elif msg_text[:5] == '-stop' or msg_text[:2] == '-s':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
                 self.player_ctrl.pause()
-                print('stop')
+                # print('stop')
             elif msg_text[:5] == '-time' or msg_text[:2] == '-t':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
-                print('time ' + cmd_time)
+                # print('time ' + cmd_time)
 
 
 

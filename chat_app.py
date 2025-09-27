@@ -84,7 +84,7 @@ class ChatApp:
             except Exception as e:
                 print(f"Ошибка при опросе сервера: {e}")
 
-            time.sleep(0.5)
+            time.sleep(1)
 
     def process_message_queue(self):
         """Периодически проверяет очередь и обновляет UI в главном потоке"""

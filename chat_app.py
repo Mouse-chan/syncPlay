@@ -3,7 +3,6 @@ from tkinter import scrolledtext
 import threading
 import queue
 import time
-from collections import deque
 
 from player_controller import PlayerCtrl
 from messages_controller import MessagesCtrl
@@ -18,8 +17,6 @@ class ChatApp:
 
         self.msg_ctrl = MessagesCtrl()
         self.message_queue = queue.Queue()  # Очередь для новых сообщений
-        self.last_message_time = 0  # Временная метка последнего сообщения
-        self.message_batch = deque()  # Буфер для батчинга сообщений
 
         self.player_ctrl = PlayerCtrl()
 
@@ -78,110 +75,56 @@ class ChatApp:
 
     def poll_messages_worker(self):
         """Рабочая функция для опроса сервера в отдельном потоке"""
-        last_poll_time = 0
-        poll_interval = 0.3  # Уменьшенный интервал опроса
-
         while self.polling_active:
-            current_time = time.time()
+            try:
+                new_messages = self.msg_ctrl.receive_message()
+                if new_messages:
+                    # Помещаем сообщения в очередь вместо прямого обновления UI
+                    self.message_queue.put(new_messages)
+            except Exception as e:
+                print(f"Ошибка при опросе сервера: {e}")
 
-            # Регулируем частоту опросов в зависимости от нагрузки
-            if current_time - last_poll_time >= poll_interval:
-                try:
-                    new_messages = self.msg_ctrl.receive_message()
-                    if new_messages:
-                        current_time = time.time()
-                        # Добавляем временную метку и пакетируем сообщения
-                        for msg in new_messages:
-                            msg['_timestamp'] = current_time
-                        self.message_queue.put(new_messages)
-                        last_poll_time = current_time
-                except Exception as e:
-                    print(f"Ошибка при опросе сервера: {e}")
-                    # Увеличиваем интервал при ошибках
-                    poll_interval = min(2.0, poll_interval * 1.5)
-                else:
-                    # Постепенно уменьшаем интервал при успешных опросах
-                    poll_interval = max(0.1, poll_interval * 0.9)
-
-            # Небольшая пауза для снижения нагрузки на CPU
-            time.sleep(0.01)
+            # Пауза между опросами
+            time.sleep(1)  # Уменьшил интервал опроса для более быстрого обновления
 
     def process_message_queue(self):
         """Периодически проверяет очередь и обновляет UI в главном потоке"""
         try:
-            # Обрабатываем сообщения пачками
-            processed_count = 0
-            max_messages_per_frame = 10  # Максимальное количество сообщений за один кадр
-
-            while processed_count < max_messages_per_frame:
-                # Обновляем состояние плеера
+            # Обрабатываем все сообщения в очереди
+            while True:
                 event = self.update_player()
-                if event:
-                    self.event_manage(event)
+                self.event_manage(event)
 
-                # Получаем сообщения
-                try:
-                    messages = self.message_queue.get_nowait()
-                    if messages:
-                        # Добавляем сообщения в буфер
-                        self.message_batch.extend(messages)
-                        processed_count += len(messages)
-                except queue.Empty:
-                    break
+                messages = self.message_queue.get_nowait()
+                self.update_chat_display(messages)
+                self.check_chat_commands(messages)
+        except queue.Empty:
+            pass
 
-            # Обрабатываем накопленные сообщения
-            if self.message_batch:
-                # Сортируем по времени, если это важно
-                self.message_batch = list(self.message_batch)
-                self.message_batch.sort(key=lambda x: x.get('_timestamp', 0))
-                self.update_chat_display(self.message_batch)
-                self.check_chat_commands(self.message_batch)
-                self.message_batch = deque()
-
-        except Exception as e:
-            print(f"Ошибка при обработке очереди: {e}")
-        finally:
-            # Планируем следующую проверку с динамическим интервалом
-            next_check = 50 if self.message_queue.qsize() > 0 else 100
-            self.master.after(next_check, self.process_message_queue)
+        # Планируем следующую проверку через 100 мс
+        self.master.after(100, self.process_message_queue)
 
     def event_manage(self, event):
         if not event:
             return
         self.send_message_handler(message=event)
 
-    def update_chat_display(self, messages):
-        """Обновляет окно чата новыми сообщениями с оптимизацией производительности"""
-        if not messages:
-            return
 
+    def update_chat_display(self, messages):
+        """Обновляет окно чата новыми сообщениями"""
         self.chat_history.config(state='normal')
 
-        try:
-            # Отключаем обновление виджета во время вставки
-            self.chat_history.configure(autoseparators=False)
-            self.chat_history.configure(state='normal')
+        # Более эффективное обновление - отключаем автообновление во время вставки
+        self.chat_history.configure(autoseparators=False)
 
-            # Собираем все сообщения в один буфер
-            buffer = []
-            for msg in messages:
-                time_str = msg.get('time', '??:??')
-                nickname = msg.get('nickname', 'Unknown')
-                text = msg.get('text', '')
-                buffer.append(f"[{time_str}] {nickname}: {text}\n")
+        for msg in messages:
+            formatted_msg = f"[{msg.get('time', '??:??')}] {msg.get('nickname', 'Unknown')}: {msg.get('text', '')}\n"
+            self.chat_history.insert(tk.END, formatted_msg)
 
-            # Вставляем все сообщения за один вызов
-            if buffer:
-                self.chat_history.insert(tk.END, ''.join(buffer))
-                self.chat_history.see(tk.END)
-
-        except Exception as e:
-            print(f"Ошибка при обновлении чата: {e}")
-
-        finally:
-            # Восстанавливаем настройки
-            self.chat_history.configure(autoseparators=True)
-            self.chat_history.config(state='disabled')
+        # Включаем обратно автообновление
+        self.chat_history.configure(autoseparators=True)
+        self.chat_history.see(tk.END)
+        self.chat_history.config(state='disabled')
 
     def update_player(self):
         return self.player_ctrl.update()
@@ -198,7 +141,6 @@ class ChatApp:
             if not msg_text or msg_text[0] != "-" or abs(cur_time_ms-msg_time_ms) > 60000:
                 continue
 
-            #if True:
             if msg_user == self.msg_ctrl.user_id:
                 if msg_text[:5] == '-nick' or msg_text[:2] == '-n':
                     new_nick = msg_text.split(' ')[1]
@@ -208,7 +150,6 @@ class ChatApp:
                     self.player_ctrl.close_player()
                     self.player_ctrl = PlayerCtrl()
                     self.player_ctrl.set_new_video(new_video_path)
-            #else:
             if msg_text[:5] == '-play' or msg_text[:2] == '-p':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)

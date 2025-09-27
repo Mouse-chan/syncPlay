@@ -64,7 +64,7 @@ class ChatApp:
         # Запускаем периодическую проверку очереди сообщений
         self.process_message_queue()
 
-        self.send_message_handler(message='*Подключился*')
+        self.send_message_handler(message='*Пoдключился*')
 
     def send_message_handler(self, event=None, message=None):
         """Обрабатывает отправку сообщения в отдельном потоке"""
@@ -153,21 +153,24 @@ class ChatApp:
             msg_time = msg.get('time')
             msg_time_ms = str_time_to_ms(msg_time)
             cur_time_ms = str_time_to_ms(time.strftime("%H:%M:%S"))
-            if not msg_text or msg_text[0] != "-" or abs(cur_time_ms - msg_time_ms) > 60000:
+            if not msg_text or msg_text[0] != "-" or abs(cur_time_ms - msg_time_ms) > 30000:
                 continue
 
             if msg_user == self.msg_ctrl.user_id:
                 if msg_text[:5] == '-nick' or msg_text[:3] == '-n ':
                     new_nick = msg_text.split(' ')[1]
                     self.msg_ctrl.nickname = new_nick
-                if msg_text[:5] == '-load' or msg_text[:3] == '-l ':
+                elif msg_text[:5] == '-load' or msg_text[:3] == '-l ':
                     new_video_path = msg_text.replace(' ', '*', 1).split('*')[1]
                     self.player_ctrl.close_player()
                     self.player_ctrl = PlayerCtrl()
                     self.player_ctrl.set_new_video(new_video_path)
-                if msg_text[:5] == '-pass':
+                elif msg_text[:5] == '-pass':
                     new_pass = msg_text.split(' ')[1]
                     self.msg_ctrl.password = new_pass
+                    self.msg_ctrl.MESSAGES = []
+                elif msg_text == '-exit' or msg_text == '-e':
+                    self.on_closing()
             if msg_text[:5] == '-play' or msg_text[:3] == '-p ':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
@@ -200,7 +203,7 @@ class ChatApp:
             self.polling_active = False
 
             try:
-                encrypt = encrypt_message('*Отключился*', self.msg_ctrl.password)
+                encrypt = encrypt_message('*Oтключился*', self.msg_ctrl.password)
                 self.msg_ctrl.send_message(encrypt)
                 print("Сообщение об отключении отправлено")
             except Exception as e:

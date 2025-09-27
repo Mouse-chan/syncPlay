@@ -96,13 +96,7 @@ class PlayerCtrl:
         current_time = time.time()
 
         try:
-            if keyboard.is_pressed('esc'):
-                self._player.stop()
-                self._last_key_time = current_time
-                sys.exit(0)
-
-
-            elif keyboard.is_pressed('shift+left'):
+            if keyboard.is_pressed('shift+left'):
                 self._player.set_time(max(0, self._player.get_time() - 500))
                 self.current_time_str = time.strftime('%H:%M:%S', time.gmtime(self._player.get_time() / 1000))
                 return '-time ' + self.current_time_str

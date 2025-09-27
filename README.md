@@ -26,3 +26,8 @@ os.add_dll_directory(r'C:\Program Files\VideoLAN\VLC') # пример`
 * `-time {hh:mm:ss} (-t {hh:mm:ss})` - перемотка
 * `-load {video_path} (-l {video_path})` - загрузка видео
 * `-pass {password}` - установка пароля
+
+
+# Сборка в exe
+`pip install auto-py-to-exe`
+`auto-py-to-exe`

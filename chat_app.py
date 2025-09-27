@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, filedialog
 import threading
 import queue
 import time
@@ -40,9 +40,17 @@ class ChatApp:
         self.entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.entry.bind("<Return>", self.send_message_handler)
 
+        # Кнопка загрузки видео
+        self.load_video_btn = tk.Button(
+            self.input_frame,
+            text="Загрузить",
+            command=self.load_video
+        )
+        self.load_video_btn.pack(side=tk.RIGHT, padx=5)
+
         # Кнопка отправки сообщения
         self.send_button = tk.Button(self.input_frame, text="Отправить", command=self.send_message_handler)
-        self.send_button.pack(side=tk.RIGHT)
+        self.send_button.pack(side=tk.RIGHT, padx=5)
 
         # Запускаем поток для отправки сообщений
         self.send_thread = None
@@ -84,7 +92,7 @@ class ChatApp:
             except Exception as e:
                 print(f"Ошибка при опросе сервера: {e}")
 
-            time.sleep(1)
+            time.sleep(0.5)
 
     def process_message_queue(self):
         """Периодически проверяет очередь и обновляет UI в главном потоке"""
@@ -107,7 +115,6 @@ class ChatApp:
         if not event:
             return
         self.send_message_handler(message=event)
-
 
     def update_chat_display(self, messages):
         """Обновляет окно чата новыми сообщениями"""
@@ -137,7 +144,7 @@ class ChatApp:
             msg_time = msg.get('time')
             msg_time_ms = str_time_to_ms(msg_time)
             cur_time_ms = str_time_to_ms(time.strftime("%H:%M:%S"))
-            if not msg_text or msg_text[0] != "-" or abs(cur_time_ms-msg_time_ms) > 60000:
+            if not msg_text or msg_text[0] != "-" or abs(cur_time_ms - msg_time_ms) > 60000:
                 continue
 
             if msg_user == self.msg_ctrl.user_id:
@@ -161,10 +168,26 @@ class ChatApp:
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
 
+    def load_video(self):
+        """Открывает диалог выбора видеофайла и загружает выбранное видео"""
+        # Открываем диалог выбора файла
+        file_path = filedialog.askopenfilename(
+            title="Выберите видеофайл",
+            filetypes=(
+                ("Видеофайлы", "*.mp4 *.avi *.mkv *.mov *.flv"),
+                ("Все файлы", "*.*")
+            )
+        )
+
+        if file_path:
+            self.send_message_handler(message=f"-load {file_path}")
 
     def on_closing(self):
         """Вызывается при закрытии приложения"""
         self.polling_active = False
+        # Закрываем плеер при выходе
+        if hasattr(self, 'player_ctrl'):
+            self.player_ctrl.close_player()
         self.master.destroy()
 
 

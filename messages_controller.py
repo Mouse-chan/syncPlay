@@ -17,6 +17,7 @@ class MessagesCtrl:
     def __init__(self):  # TODO: delite if not use
         self.user_id = str(int(hashlib.sha256(os.getlogin().encode()).hexdigest(), 16))[:5]
         self.nickname = 'user' + self.user_id
+        self.password = 'none'
 
     def check_connection(self):
         try:

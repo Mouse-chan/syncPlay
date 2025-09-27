@@ -7,6 +7,8 @@ import time
 from player_controller import PlayerCtrl
 from messages_controller import MessagesCtrl
 from static import str_time_to_ms
+from static import decrypt_message
+from static import encrypt_message
 
 
 class ChatApp:
@@ -77,7 +79,8 @@ class ChatApp:
     def send_message_worker(self, message):
         """Рабочая функция для отправки сообщения в отдельном потоке"""
         try:
-            self.msg_ctrl.send_message(message)
+            encrypt = encrypt_message(message, self.msg_ctrl.password)
+            self.msg_ctrl.send_message(encrypt)
         except Exception as e:
             print(f"Ошибка отправки: {e}")
 
@@ -124,8 +127,11 @@ class ChatApp:
         self.chat_history.configure(autoseparators=False)
 
         for msg in messages:
-            formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}: {msg.get('text', '')}\n"
-            self.chat_history.insert(tk.END, formatted_msg)
+            text_msg = msg.get('text', '')
+            decrypt = decrypt_message(text_msg, self.msg_ctrl.password)
+            if decrypt is not None and '-pass' not in decrypt:
+                formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}: {decrypt}\n"
+                self.chat_history.insert(tk.END, formatted_msg)
 
         # Включаем обратно автообновление
         self.chat_history.configure(autoseparators=True)
@@ -140,6 +146,7 @@ class ChatApp:
 
         for msg in messages:
             msg_text: str = msg.get('text', None)
+            msg_text: str = decrypt_message(msg_text, self.msg_ctrl.password)
             msg_user = msg.get('user')
             msg_time = msg.get('time')
             msg_time_ms = str_time_to_ms(msg_time)
@@ -148,23 +155,26 @@ class ChatApp:
                 continue
 
             if msg_user == self.msg_ctrl.user_id:
-                if msg_text[:5] == '-nick' or msg_text[:2] == '-n':
+                if msg_text[:5] == '-nick' or msg_text[:3] == '-n ':
                     new_nick = msg_text.split(' ')[1]
                     self.msg_ctrl.nickname = new_nick
-                if msg_text[:5] == '-load' or msg_text[:2] == '-l':
+                if msg_text[:5] == '-load' or msg_text[:3] == '-l ':
                     new_video_path = msg_text.replace(' ', '*', 1).split('*')[1]
                     self.player_ctrl.close_player()
                     self.player_ctrl = PlayerCtrl()
                     self.player_ctrl.set_new_video(new_video_path)
-            if msg_text[:5] == '-play' or msg_text[:2] == '-p':
+                if msg_text[:5] == '-pass':
+                    new_pass = msg_text.split(' ')[1]
+                    self.msg_ctrl.password = new_pass
+            if msg_text[:5] == '-play' or msg_text[:3] == '-p ':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
                 self.player_ctrl.play()
-            elif msg_text[:5] == '-stop' or msg_text[:2] == '-s':
+            elif msg_text[:5] == '-stop' or msg_text[:3] == '-s ':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
                 self.player_ctrl.pause()
-            elif msg_text[:5] == '-time' or msg_text[:2] == '-t':
+            elif msg_text[:5] == '-time' or msg_text[:3] == '-t ':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
 

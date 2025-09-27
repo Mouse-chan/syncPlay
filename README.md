@@ -25,3 +25,4 @@ os.add_dll_directory(r'C:\Program Files\VideoLAN\VLC') # пример`
 * `-stop {hh:mm:ss} (-s {hh:mm:ss})` - стоп + синхронизация времени
 * `-time {hh:mm:ss} (-t {hh:mm:ss})` - перемотка
 * `-load {video_path} (-l {video_path})` - загрузка видео
+* `-pass {password}` - установка пароля

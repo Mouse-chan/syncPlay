@@ -2,8 +2,6 @@ import vlc
 import time
 import keyboard
 import win32gui
-import win32process
-import os
 import sys
 
 
@@ -12,7 +10,6 @@ def is_window_active_cached():
     try:
         window = win32gui.GetForegroundWindow()
         window_title = win32gui.GetWindowText(window)
-        # Проверяем, что активное окно - это окно VLC (обычно содержит 'VLC' в заголовке)
         return 'VLC' in window_title
     except:
         return False

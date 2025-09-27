@@ -84,8 +84,7 @@ class ChatApp:
             except Exception as e:
                 print(f"Ошибка при опросе сервера: {e}")
 
-            # Пауза между опросами
-            time.sleep(1)  # Уменьшил интервал опроса для более быстрого обновления
+            time.sleep(0.5)
 
     def process_message_queue(self):
         """Периодически проверяет очередь и обновляет UI в главном потоке"""
@@ -118,7 +117,7 @@ class ChatApp:
         self.chat_history.configure(autoseparators=False)
 
         for msg in messages:
-            formatted_msg = f"[{msg.get('time', '??:??')}] {msg.get('nickname', 'Unknown')}: {msg.get('text', '')}\n"
+            formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}: {msg.get('text', '')}\n"
             self.chat_history.insert(tk.END, formatted_msg)
 
         # Включаем обратно автообновление

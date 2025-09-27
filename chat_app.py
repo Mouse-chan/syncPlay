@@ -64,6 +64,8 @@ class ChatApp:
         # Запускаем периодическую проверку очереди сообщений
         self.process_message_queue()
 
+        self.send_message_handler(message='*Подключился*')
+
     def send_message_handler(self, event=None, message=None):
         """Обрабатывает отправку сообщения в отдельном потоке"""
         if not message:
@@ -194,16 +196,28 @@ class ChatApp:
 
     def on_closing(self):
         """Вызывается при закрытии приложения"""
-        self.polling_active = False
-        # Закрываем плеер при выходе
-        if hasattr(self, 'player_ctrl'):
-            self.player_ctrl.close_player()
-        self.master.destroy()
+        try:
+            self.polling_active = False
+
+            try:
+                encrypt = encrypt_message('*Отключился*', self.msg_ctrl.password)
+                self.msg_ctrl.send_message(encrypt)
+                print("Сообщение об отключении отправлено")
+            except Exception as e:
+                print(f"Не удалось отправить сообщение об отключении: {e}")
+
+            if hasattr(self, 'player_ctrl'):
+                self.player_ctrl.close_player()
+            self.master.destroy()
+
+        except Exception as e:
+            print(f"Ошибка при закрытии: {e}")
+            self.master.destroy()
 
 
 # Запуск приложения
 if __name__ == "__main__":
     root = tk.Tk()
     app = ChatApp(root)
-    root.protocol("WM_DELETE_WINDOW", app.on_closing)
+    root.protocol("WM_DELETE_WINDOW", lambda: app.on_closing())
     root.mainloop()

@@ -102,7 +102,7 @@ class ChatApp:
             except Exception as e:
                 print(f"Ошибка при опросе сервера: {e}")
 
-            time.sleep(0.5)
+            time.sleep(1)
 
     def process_message_queue(self):
         """Периодически проверяет очередь и обновляет UI в главном потоке"""
@@ -175,8 +175,7 @@ class ChatApp:
                     self.player_ctrl.set_new_video(new_video_path)
                 elif msg_text[:5] == '-pass':
                     new_pass = msg_text.split(' ')[1]
-                    if new_pass != self.msg_ctrl.password and abs(cur_time_ms - msg_time_ms) < 5000:
-                        print(new_pass, self.msg_ctrl.password)
+                    if new_pass != self.msg_ctrl.password and abs(cur_time_ms - msg_time_ms) < 10000:
                         self.msg_ctrl.password = new_pass
                         self.chat_history.config(state='normal')
                         self.chat_history.delete(1.0, tk.END)
@@ -218,6 +217,7 @@ class ChatApp:
 
         if file_path:
             self.send_message_handler(message=f"-load {file_path}")
+            self.send_message_handler('-stop 00:00:00')
 
     def on_closing(self):
         """Вызывается при закрытии приложения"""

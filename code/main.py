@@ -1,9 +1,8 @@
 # main.py
 
-import time
 import tkinter as tk
 
-from chat_app import ChatApp
+from code.chat_app import ChatApp
 
 
 def main():

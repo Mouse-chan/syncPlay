@@ -6,7 +6,7 @@ import time
 
 from player_controller import PlayerCtrl
 from messages_controller import MessagesCtrl
-from static import str_time_to_ms
+from static import str_time_to_ms, is_admin_user_id
 from static import decrypt_message
 from static import encrypt_message
 
@@ -65,6 +65,7 @@ class ChatApp:
         self.process_message_queue()
 
         self.send_message_handler(message='*Пoдключился*')
+        self.send_message_handler(message=self.msg_ctrl.password)
 
     def send_message_handler(self, event=None, message=None):
         """Обрабатывает отправку сообщения в отдельном потоке"""
@@ -131,7 +132,7 @@ class ChatApp:
         for msg in messages:
             text_msg = msg.get('text', '')
             decrypt = decrypt_message(text_msg, self.msg_ctrl.password)
-            if decrypt is not None and '-pass' not in decrypt:
+            if decrypt is not None and ('-pass' not in decrypt or is_admin_user_id(self.msg_ctrl.user_id)):
                 formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}: {decrypt}\n"
                 self.chat_history.insert(tk.END, formatted_msg)
 
@@ -182,6 +183,10 @@ class ChatApp:
             elif msg_text[:5] == '-time' or msg_text[:3] == '-t ':
                 cmd_time = msg_text.split(' ')[1]
                 self.player_ctrl.set_time(cmd_time)
+            elif msg_text[:5] == '-kick':
+                kick_user = msg_text.split(' ')[1]
+                if is_admin_user_id(msg_user) and kick_user == self.msg_ctrl.user_id:
+                    self.on_closing()
 
     def load_video(self):
         """Открывает диалог выбора видеофайла и загружает выбранное видео"""

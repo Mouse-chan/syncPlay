@@ -37,3 +37,6 @@ def decrypt_message(encrypted_message, password):
     except InvalidToken:
         return None
 
+
+def is_admin_user_id(user_id):
+    return user_id in ['79032', '12617']

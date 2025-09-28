@@ -17,12 +17,12 @@ VSVersionInfo(
           '040904b0',
           [StringStruct('CompanyName', 'NezuMi'),
           StringStruct('FileDescription', 'Приложение для синхронного просмотра видео с чатом'),
-          StringStruct('FileVersion', '1.0.0.0'),
+          StringStruct('FileVersion', '1.0.0.1'),
           StringStruct('InternalName', 'syncPlay'),
           StringStruct('LegalCopyright', 'Copyright © 2025 Все права защищены.'),
           StringStruct('OriginalFilename', 'syncPlay.exe'),
           StringStruct('ProductName', 'syncPlay'),
-          StringStruct('ProductVersion', '1.0.0.0')])
+          StringStruct('ProductVersion', '1.0.0.1')])
       ]),
     VarFileInfo([VarStruct('Translation', [1033, 1200])])
   ]

@@ -21,7 +21,7 @@ VSVersionInfo(
           StringStruct('InternalName', 'syncPlay'),
           StringStruct('LegalCopyright', 'Copyright © 2025 Все права защищены.'),
           StringStruct('OriginalFilename', 'syncPlay.exe'),
-          StringStruct('ProductName', 'Video Chat Application'),
+          StringStruct('ProductName', 'syncPlay'),
           StringStruct('ProductVersion', '1.0.0.0')])
       ]),
     VarFileInfo([VarStruct('Translation', [1033, 1200])])

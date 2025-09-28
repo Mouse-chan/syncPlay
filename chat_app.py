@@ -65,7 +65,7 @@ class ChatApp:
         #self.process_message_queue()
 
         self.send_message_handler(message='*Пoдключился*')
-        time.sleep(0.02)
+        time.sleep(1)
         self.send_message_handler(message='-pass ' + self.msg_ctrl.user_id)
         time.sleep(0.02)
         # Запускаем периодическую проверку очереди сообщений
@@ -177,10 +177,10 @@ class ChatApp:
                     new_pass = msg_text.split(' ')[1]
                     if new_pass != self.msg_ctrl.password and abs(cur_time_ms - msg_time_ms) < 10000:
                         self.msg_ctrl.password = new_pass
-                        self.chat_history.config(state='normal')
+                        """self.chat_history.config(state='normal')
                         self.chat_history.delete(1.0, tk.END)
                         self.chat_history.config(state='disabled')
-                        self.msg_ctrl.MESSAGES = []
+                        self.msg_ctrl.MESSAGES = []"""
                         if new_pass == 'none':
                             self.send_message_handler(message=f'*Пoдключился*')
                         else:

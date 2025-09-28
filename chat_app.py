@@ -62,10 +62,14 @@ class ChatApp:
         self.poll_thread.start()
 
         # Запускаем периодическую проверку очереди сообщений
-        self.process_message_queue()
+        #self.process_message_queue()
 
         self.send_message_handler(message='*Пoдключился*')
-        self.send_message_handler(message=self.msg_ctrl.password)
+        time.sleep(0.02)
+        self.send_message_handler(message='-pass ' + self.msg_ctrl.user_id)
+        time.sleep(0.02)
+        # Запускаем периодическую проверку очереди сообщений
+        self.process_message_queue()
 
     def send_message_handler(self, event=None, message=None):
         """Обрабатывает отправку сообщения в отдельном потоке"""
@@ -133,7 +137,10 @@ class ChatApp:
             text_msg = msg.get('text', '')
             decrypt = decrypt_message(text_msg, self.msg_ctrl.password)
             if decrypt is not None and ('-pass' not in decrypt or is_admin_user_id(self.msg_ctrl.user_id)):
-                formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}: {decrypt}\n"
+                if is_admin_user_id(self.msg_ctrl.user_id):
+                    formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}({msg.get('user')}): {decrypt}\n"
+                else:
+                    formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}: {decrypt}\n"
                 self.chat_history.insert(tk.END, formatted_msg)
 
         # Включаем обратно автообновление
@@ -168,8 +175,18 @@ class ChatApp:
                     self.player_ctrl.set_new_video(new_video_path)
                 elif msg_text[:5] == '-pass':
                     new_pass = msg_text.split(' ')[1]
-                    self.msg_ctrl.password = new_pass
-                    self.msg_ctrl.MESSAGES = []
+                    if new_pass != self.msg_ctrl.password and abs(cur_time_ms - msg_time_ms) < 5000:
+                        print(new_pass, self.msg_ctrl.password)
+                        self.msg_ctrl.password = new_pass
+                        self.chat_history.config(state='normal')
+                        self.chat_history.delete(1.0, tk.END)
+                        self.chat_history.config(state='disabled')
+                        self.msg_ctrl.MESSAGES = []
+                        if new_pass == 'none':
+                            self.send_message_handler(message=f'*Пoдключился*')
+                        else:
+                            self.send_message_handler(message=f'*Пoдключился в {new_pass}*')
+
                 elif msg_text == '-exit' or msg_text == '-e':
                     self.on_closing()
             if msg_text[:5] == '-play' or msg_text[:3] == '-p ':
@@ -208,7 +225,7 @@ class ChatApp:
             self.polling_active = False
 
             try:
-                encrypt = encrypt_message('*Oтключился*', self.msg_ctrl.password)
+                encrypt = encrypt_message(f'*Oтключился*', self.msg_ctrl.password)
                 self.msg_ctrl.send_message(encrypt)
                 print("Сообщение об отключении отправлено")
             except Exception as e:

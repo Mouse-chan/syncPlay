@@ -2,7 +2,7 @@
 
 import tkinter as tk
 
-from code.chat_app import ChatApp
+from chat_app import ChatApp
 
 
 def main():

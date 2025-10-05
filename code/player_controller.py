@@ -152,7 +152,7 @@ class PlayerCtrl:
 
         audios = [item[0] for item in d]
         cur = audios.index(self._player.audio_get_track())
-        self._player.audio_set_track(audios[1] if cur == len(audios) - 1 else audios[cur + 1])
+        self._player.audio_set_track(audios[0] if cur == len(audios) - 1 else audios[cur + 1])
 
     def _switch_subtitle_track(self):
         """Переключение субтитров"""

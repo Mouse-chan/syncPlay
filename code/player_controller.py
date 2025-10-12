@@ -1,4 +1,5 @@
 import vlc
+from vlc import MediaSlaveType
 import time
 import keyboard
 import win32gui
@@ -50,6 +51,49 @@ class PlayerCtrl:
         self._player.audio_set_mute(False)
         time.sleep(0.5)
         self._player.pause()
+
+    def add_new_subs(self, subtitle_path):
+        try:
+            # Проверяем существование файла
+            import os
+            if not os.path.exists(subtitle_path):
+                print(f"Файл субтитров не найден: {subtitle_path}")
+                return False
+
+            # Метод 1: Используем add_slave (рекомендуется для VLC 3.0+)
+            try:
+                # VLC MediaSlaveType для субтитров
+                result = self._player.add_slave(
+                    0,  # 0 = субтитры (vlc.MediaSlaveType.subtitle)
+                    subtitle_path,
+                    True  # выбрать сразу
+                )
+                if result == 0:
+                    print(f"✅ Субтитры успешно добавлены: {subtitle_path}")
+                    # return True
+            except AttributeError:
+                print("⚠️ Метод add_slave не поддерживается, пробуем альтернативный метод...")
+
+            # Метод 2: Альтернативный способ через установку файла субтитров
+            try:
+                result = self._player.video_set_subtitle_file(subtitle_path)
+                if result:  # 0 означает успех в VLC
+                    print(f"✅ Субтитры успешно добавлены методом 2: {subtitle_path}")
+                    return True
+                else:
+                    print(f"❌ Ошибка добавления субтитров: {subtitle_path}")
+                    return False
+            except Exception as e:
+                print(f"❌ Ошибка при добавлении субтитров: {e}")
+                return False
+
+        except Exception as e:
+            print(f"❌ Неожиданная ошибка субтитров: {e}")
+            return False
+
+        except Exception as e:
+            print(f"Error adding subtitle: {e}")
+            return False
 
     def play(self):
         if not self._player.is_playing():

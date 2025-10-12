@@ -189,6 +189,13 @@ class ChatApp:
                             self.send_message_handler(message=f'*Пoдключился*')
                         else:
                             self.send_message_handler(message=f'*Пoдключился в {new_pass}*')
+                elif msg_text[:5] == '-subs':
+                    new_subs = msg_text.replace('-subs ', '')
+                    new_subs = new_subs.replace('"', '')
+                    if new_subs == 's':
+                        self.player_ctrl.add_new_subs("C:\\Users\\belak\\Desktop\\ONE PIECE\\One Piece - 482 (1280x720 x264 AAC) [yibis].ass")
+                    else:
+                        self.player_ctrl.add_new_subs(new_subs)
 
                 elif msg_text == '-exit' or msg_text == '-e':
                     self.on_closing()

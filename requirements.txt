@@ -3,3 +3,4 @@ requests~=2.32.5
 python-vlc
 pywin32
 pyinstaller
+cryptography

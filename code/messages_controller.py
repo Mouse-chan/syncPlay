@@ -3,7 +3,7 @@
 import hashlib
 import os
 import requests
-import time
+from datetime import datetime
 
 
 def a_origin_els(a, b):
@@ -31,13 +31,11 @@ class MessagesCtrl:
 
     def send_message(self, message):
         try:
-            if message[0] == '/':
-                return False  # TODO: funcs in chat
-
+            time = datetime.now()
             new_msg = {
                 'user': self.user_id,
                 'nickname': self.nickname,
-                'time': str(time.strftime("%H:%M:%S")),
+                'time': str(time.strftime("%H:%M:%S:%f")[:-3]),
                 'text': message
             }
             response = requests.post(f"{self.SERVER_URL}/send",

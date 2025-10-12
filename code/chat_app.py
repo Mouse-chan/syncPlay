@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import scrolledtext, filedialog
 import threading
 import queue
+from datetime import datetime
 import time
 
 from player_controller import PlayerCtrl
@@ -65,7 +66,7 @@ class ChatApp:
         #self.process_message_queue()
 
         self.send_message_handler(message='*Пoдключился*')
-        time.sleep(1)
+        time.sleep(0.02)
         self.send_message_handler(message='-pass ' + self.msg_ctrl.user_id)
         time.sleep(0.02)
         # Запускаем периодическую проверку очереди сообщений
@@ -97,6 +98,7 @@ class ChatApp:
             try:
                 new_messages = self.msg_ctrl.receive_message()
                 if new_messages:
+                    new_messages.sort(key=lambda x: str_time_to_ms(x.get('time')))
                     # Помещаем сообщения в очередь вместо прямого обновления UI
                     self.message_queue.put(new_messages)
             except Exception as e:
@@ -137,10 +139,11 @@ class ChatApp:
             text_msg = msg.get('text', '')
             decrypt = decrypt_message(text_msg, self.msg_ctrl.password)
             if decrypt is not None and ('-pass' not in decrypt or is_admin_user_id(self.msg_ctrl.user_id)):
+                str_msg_time = ':'.join((str(msg.get('time', '??:??:??:???')).split(":"))[:-1])
                 if is_admin_user_id(self.msg_ctrl.user_id):
-                    formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}({msg.get('user')}): {decrypt}\n"
+                    formatted_msg = f"[{str_msg_time}] {msg.get('nickname', 'Unknown')}({msg.get('user')}): {decrypt}\n"
                 else:
-                    formatted_msg = f"[{msg.get('time', '??:??:??')}] {msg.get('nickname', 'Unknown')}: {decrypt}\n"
+                    formatted_msg = f"[{str_msg_time}] {msg.get('nickname', 'Unknown')}: {decrypt}\n"
                 self.chat_history.insert(tk.END, formatted_msg)
 
         # Включаем обратно автообновление
@@ -153,14 +156,15 @@ class ChatApp:
 
     def check_chat_commands(self, messages):
         # TODO: обработчик команд, с учётом задержки
-
         for msg in messages:
             msg_text: str = msg.get('text', None)
             msg_text: str = decrypt_message(msg_text, self.msg_ctrl.password)
             msg_user = msg.get('user')
             msg_time = msg.get('time')
             msg_time_ms = str_time_to_ms(msg_time)
-            cur_time_ms = str_time_to_ms(time.strftime("%H:%M:%S"))
+            now = datetime.now()
+            cur_time_ms = str_time_to_ms(now.strftime("%H:%M:%S:%f")[:-3])
+
             if not msg_text or msg_text[0] != "-" or abs(cur_time_ms - msg_time_ms) > 30000:
                 continue
 

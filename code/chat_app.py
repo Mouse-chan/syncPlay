@@ -66,7 +66,7 @@ class ChatApp:
         #self.process_message_queue()
 
         self.send_message_handler(message='*Пoдключился*')
-        time.sleep(1)
+        time.sleep(0.02)
         self.send_message_handler(message='-pass ' + self.msg_ctrl.user_id)
         time.sleep(0.02)
         # Запускаем периодическую проверку очереди сообщений
